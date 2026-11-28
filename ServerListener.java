@@ -10,6 +10,8 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class ServerListener implements Runnable {
     /** put on the reply queue when the server closes the connection. */
@@ -19,6 +21,8 @@ public final class ServerListener implements Runnable {
     private final BlockingQueue<String> replyQueue;
     /** true right after a JOIN reply, so the "recent posts" heading only prints if posts follow. */
     private boolean awaitingRecentPosts = false;
+    //1.2 ADITTION
+    private final Map<String, String> groupNames = new ConcurrentHashMap<>();
 
     public ServerListener(BufferedReader fromServer, BlockingQueue<String> replyQueue) {
         this.fromServer = fromServer;
@@ -87,6 +91,9 @@ public final class ServerListener implements Runnable {
             case "LEAVE":
                 System.out.println("You left the " + groupLabel(fields[2]) + " board.");
                 break;
+            case "GROUPS":
+                //OK|GRUOPS| id:name
+                System.out.println("Available groups (id:name):")
             case "EXIT":
                 System.out.println("Disconnected from the server.");
                 break;
@@ -102,9 +109,15 @@ public final class ServerListener implements Runnable {
     }
 
     /** group 0 is the public board. Part 2 can map ids 1-5 to their names here. */
-    private static String groupLabel(String groupId) {
-        return groupId.equals("0") ? "public" : "group " + groupId;
+    private String groupLabel(String groupId) {
+        if (groupId.equals("0")) {
+            return "public"
+        }
+        String name = groupNames.get(groupId);
+        return name != null ? name + "(group " + groupId + ")" : "group " + groupId;
     }
+        
+        
 
     private static String describeError(String requestType, String code) {
         switch (code) {
