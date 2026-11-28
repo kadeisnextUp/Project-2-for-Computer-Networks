@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.StringJoiner;
 
 public final class BoardRegistry {
     public static final int PUBLIC_GROUP_ID = 0;
@@ -20,6 +21,12 @@ public final class BoardRegistry {
     /** every server starts with the Part 1 public board (id 0) already created */
     public BoardRegistry() {
         addGroup(new Group(PUBLIC_GROUP_ID, "public"));
+    /** 1.2 Addition of private groups NEW*/
+        addGroup(new Group(1, "Computer Networks"));
+        addGroup(new Group(2, "Data Privacy"));
+        addGroup(new Group(3, "Operating systems"));
+        addGroup(new Group(4, "Software Engineering"));
+        addGroup(new Group(5, "Random Topics"));
     }
 
     public void addGroup(Group group) {
@@ -43,6 +50,15 @@ public final class BoardRegistry {
     public Collection<Group> allGroups() {
         return groupsById.values();
     }
+
+    /** 1.2 Group Listings, the group list the GROUPS reply sends to the client. NEW  */
+     public String groupListing() {
+         StringJoiner groupEntries = new StringJoiner(",");
+         for (Group group : groupsById.values()){
+             groupEntries.add(group.getGroupId() + ":" + group.getGroupName());
+         }
+         return groupEntries.toString();
+     }
 
     /** reservse a username. Returns false if another client already has it */
     public boolean claimUsername(String username) {
