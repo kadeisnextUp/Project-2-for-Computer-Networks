@@ -22,11 +22,11 @@ public final class BoardRegistry {
     public BoardRegistry() {
         addGroup(new Group(PUBLIC_GROUP_ID, "public"));
     /** 1.2 Addition of private groups NEW*/
-        addGroup(new Group(1, "Computer Networks"));
-        addGroup(new Group(2, "Data Privacy"));
-        addGroup(new Group(3, "Operating systems"));
-        addGroup(new Group(4, "Software Engineering"));
-        addGroup(new Group(5, "Random Topics"));
+        addGroup(new Group(1, "ComputerNetworks"));
+        addGroup(new Group(2, "DataPrivacy"));
+        addGroup(new Group(3, "OperatingSystems"));
+        addGroup(new Group(4, "SoftwareEngineering"));
+        addGroup(new Group(5, "RandomTopics"));
     }
 
     public void addGroup(Group group) {
