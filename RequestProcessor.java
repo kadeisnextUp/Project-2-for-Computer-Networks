@@ -38,6 +38,8 @@ public final class RequestProcessor {
             case "USERS":   handleUsers(client, line);   return true;
             case "MESSAGE": handleMessage(client, line); return true;
             case "LEAVE":   handleLeave(client, line);   return true;
+            //**1.2 GROUPS NEW   */ 
+            case "GROUPS":  handleGroups(client);        return true;
             case "EXIT":
                 disconnect(client);
                 client.send("OK|EXIT");
@@ -164,7 +166,11 @@ public final class RequestProcessor {
             client.send("OK|LEAVE|" + group.getGroupId());
         }
     }
-
+    //GROUPS
+    //replies with ecery group that can be joined with id:name pairs 
+    private void handleGroups(ClientConnection) {
+        client.send("OK|GROUPS|" +registry.groupListing());
+    }
     /**
      * looks up a group the client must already belong to and sends the matching
      * error and returns null when the group doesn't exist or they aren't in it
