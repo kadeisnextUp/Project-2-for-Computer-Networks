@@ -6,6 +6,7 @@
  *
  * Part 1 commands given by the assignment description: %connect, %join, %post, %users, 
  * %message, %leave, %exit, and  %help
+ * Part 2 commands: %groups, %groupjoin, %grouppost, %groupusers, %groupleave, %groupmessage
  */
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -88,6 +89,38 @@ public final class BulletinClient {
             case "%leave":
                 sendAndWait("LEAVE|" + PUBLIC_GROUP);
                 break;
+
+            //For Part 2, we added the commands as well. 
+            case "%groups":
+                sendAndWait("GROUPS");
+                break;
+            case "%groupjoin":
+                if (arguments.isEmpty()) {
+                    System.out.println("Usage: %groupjoin <group id/name>");
+                } else {
+                    sendAndWait("JOIN|" + arguments);
+                }
+                break;
+            case "%groupusers":
+                 if (arguments.isEmpty()) {
+                    System.out.println("Usage: %groupusers <group id/name>");
+                } else {
+                    sendAndWait("USERS|" + arguments);
+                }
+                break;
+            case "%groupleave":
+                if (arguments.isEmpty()) {
+                    System.out.println("Usage: %groupleave <group id/name>");
+                } else {
+                    sendAndWait("LEAVE|" + arguments);
+                }
+                break;
+            case "%groupmessage":
+                groupMessage(arguments);
+                break;
+            case "%grouppost":
+                groupPost(arguments);
+                break;
             default:
                 System.out.println("Unknown command. Type %help for the list of commands.");
         }
@@ -120,7 +153,7 @@ public final class BulletinClient {
         registerUsername();
     }
 
-    /** asks for a username until the server accepts one that isn't taken. */
+    /** asks for a username until the server accepts one that isn't taken. then asks for the group list so the user sees what can be joined */
     private void registerUsername() {
         while (isConnected()) {
             System.out.print("Enter a username: ");
@@ -133,12 +166,19 @@ public final class BulletinClient {
                 continue;
             }
             String reply = sendAndWait("USER|" + username);
-            if (reply == null || reply.startsWith("OK|")) {
+            if (reply == null) {
                 return;
             }
+            if (reply.startsWith("OK|")) {
+                sendAndWait("GROUPS"); // show the groups the user can join
+                return;
+            }
+            
+            
             // ERR|USER|NAME_TAKEN: the listener already printed why; ask again.
         }
     }
+    
 
     /** %post <subject> | <body> */
     private void post(String arguments) {
@@ -151,6 +191,38 @@ public final class BulletinClient {
         String body = arguments.substring(separator + 1).trim();
         sendAndWait("POST|" + PUBLIC_GROUP + "|" + subject + "|" + body);
     }
+
+   /** %groupmessage <group id/name> <message ID> */
+    private void groupMessage(String arguments) {
+        String[] parts = arguments.split("\\s+");
+        if (parts.length != 2 || !parts[1].matches("\\d+")) {
+            System.out.println("Usage: %groupmessage <group id/name> <message ID>");
+            return;
+        }
+        String group = parts[0];
+        String messageId = parts[1];
+        sendAndWait("MESSAGE|" + group + "|" + messageId);
+    }
+
+    /** %grouppost <group id/name> <subject> | <body> */
+    private void groupPost(String arguments) {
+        String[] groupAndRest = arguments.split("\\s+", 2);
+        if (groupAndRest.length < 2) {
+            System.out.println("Usage: %grouppost <group id/name> <subject> | <message body>");
+            return;
+        }
+        String group = groupAndRest[0];
+        String subjectAndBody = groupAndRest[1];
+
+        int separator = subjectAndBody.indexOf('|');
+        if (separator < 0 || subjectAndBody.substring(0, separator).trim().isEmpty()) {
+            System.out.println("Usage: %grouppost <group id/name> <subject> | <message body>");
+            return;
+        }
+        String subject = subjectAndBody.substring(0, separator).trim();
+        String body = subjectAndBody.substring(separator + 1).trim();
+        sendAndWait("POST|" + group + "|" + subject + "|" + body);
+    }  
 
     /** %exit: leaves every group on the server, closes the socket and quits. */
     private void exit() {
@@ -204,6 +276,13 @@ public final class BulletinClient {
         System.out.println("  %users                      list the users in the public board");
         System.out.println("  %message <message ID>       show the full content of a message");
         System.out.println("  %leave                      leave the public board");
+        System.out.println("Groups (you can be in several at once):");
+        System.out.println("  %groups                     list the groups you can join");
+        System.out.println("  %groupjoin <group>          join a group by id or name");
+        System.out.println("  %grouppost <group> <subject> | <body>   post a message to a group");
+        System.out.println("  %groupusers <group>         list the users in a group");
+        System.out.println("  %groupmessage <group> <ID>  show the full content of a message in a group");
+        System.out.println("  %groupleave <group>         leave a group");
         System.out.println("  %exit                       disconnect and quit");
     }
 }
