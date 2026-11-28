@@ -93,7 +93,12 @@ public final class ServerListener implements Runnable {
                 break;
             case "GROUPS":
                 //OK|GRUOPS| id:name
-                System.out.println("Available groups (id:name):")
+                System.out.println("Available groups (id: name):");
+                System.out.println("  1: ComputerNetworks");
+                System.out.println("  2: DataPrivacy");
+                System.out.println("  3: OperatingSystems");
+                System.out.println("  4: SoftwareEngineering");
+                System.out.println("  5: RandomTopics");
             case "EXIT":
                 System.out.println("Disconnected from the server.");
                 break;
@@ -110,11 +115,15 @@ public final class ServerListener implements Runnable {
 
     /** group 0 is the public board. Part 2 can map ids 1-5 to their names here. */
     private String groupLabel(String groupId) {
-        if (groupId.equals("0")) {
-            return "public"
+         switch (groupId) {
+            case "0":  return "public";
+            case "1":  return "ComputerNetworks (group 1)";
+            case "2":  return "DataPrivacy (group 2)";
+            case "3":  return "OperatingSystems (group 3)";
+            case "4":  return "SoftwareEngineering (group 4)";
+            case "5":  return "RandomTopics (group 5)";
+            default:   return "group " + groupId;
         }
-        String name = groupNames.get(groupId);
-        return name != null ? name + "(group " + groupId + ")" : "group " + groupId;
     }
         
         
