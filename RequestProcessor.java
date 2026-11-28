@@ -168,7 +168,7 @@ public final class RequestProcessor {
     }
     //GROUPS
     //replies with ecery group that can be joined with id:name pairs 
-    private void handleGroups(ClientConnection) {
+    private void handleGroups(ClientConnection client) {
         client.send("OK|GROUPS|" +registry.groupListing());
     }
     /**
